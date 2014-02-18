@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf8" ?>
+<root>
+	<broker BrokerID="4700" BrokerName="东海期货" BrokerEName="donghai">
+		<FloatProfitAlgorithm>浮盈浮亏都计算</FloatProfitAlgorithm>		
+		<MarginAlgorithm>按开仓价计算</MarginAlgorithm>
+		<IsDiscountCZCE>1</IsDiscountCZCE>
+		<Servers>
+			<Server>
+				<Name>电信</Name>
+				<Trading>
+					<item>tcp://ctpdx1.dh168.com.cn:41205</item>
+					<item>tcp://ctpdx2.dh168.com.cn:41205</item>
+					<item>tcp://180.166.67.246:41205</item>
+				</Trading>
+				<MarketData>
+					<item>tcp://ctpdx1.dh168.com.cn:41213</item>
+					<item>tcp://ctpdx2.dh168.com.cn:41213</item>
+					<item>tcp://180.166.67.246:41213</item>
+				</MarketData>
+			</Server>
+			<Server>
+				<Name>联通</Name>
+				<Trading>
+					<item>tcp://ctplt1.dh168.com.cn:41205</item>
+					<item>tcp://ctplt2.dh168.com.cn:41205</item>
+					<item>tcp://140.206.125.102:41205</item>
+				</Trading>
+				<MarketData>
+					<item>tcp://ctplt1.dh168.com.cn:41213</item>
+					<item>tcp://ctplt2.dh168.com.cn:41213</item>
+					<item>tcp://140.206.125.102:41213</item>
+				</MarketData>
+			</Server>
+		</Servers>
+	</broker>
+</root>

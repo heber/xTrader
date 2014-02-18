@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<NtpServer>cn.pool.ntp.org</NtpServer>
+	<SaveInfo>1</SaveInfo>
+	<BrokerGroup>183</BrokerGroup>
+	<ServerGroup>0</ServerGroup>
+	<LoginUserID>00000018</LoginUserID>
+	<UserPassword>zs3My8rJ</UserPassword>
+	<InstList>IF1402</InstList>
+	<WndInfo xPos="478" yPos="363" width="601" height="359" />
+</root>

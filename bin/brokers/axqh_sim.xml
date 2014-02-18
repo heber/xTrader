@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf8" ?>
+<root>
+	<broker BrokerID="4000" BrokerName="安信模拟" BrokerEName="axqh">
+		<Servers>
+			<Server>
+				<Name>商品模拟</Name>
+				<Trading>
+					<item>tcp://asp-sim2-front1.financial-trading-platform.com:26205</item>
+				</Trading>
+				<MarketData>
+					<item>tcp://asp-sim2-md1.financial-trading-platform.com:26213</item>
+				</MarketData>
+			</Server>
+		</Servers>
+	</broker>
+</root>
+

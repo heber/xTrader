@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf8" ?>
+<root>
+    <broker BrokerID="1017" BrokerName="中证模拟" >
+		<Servers>
+			<Server>
+				<Name>电信网络</Name>
+				<Trading>
+					<item>tcp://ctpmn1-front1.citicsf.com:51205</item>
+				</Trading>
+				<MarketData>
+					<item>tcp://ctpmn1-front1.citicsf.com:51213</item>
+				</MarketData>
+			</Server>
+		</Servers>
+	</broker>
+</root>

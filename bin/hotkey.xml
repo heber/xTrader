@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+	<limit>
+    <hotkey Mod="MOD_CONTROL" Vkey="Q" Dir="b" Ocp="o" BasePrice="Bid" Plus="2" Vol="" />
+    <hotkey Mod="MOD_ALT" Vkey="R" Dir="b" Ocp="o" BasePrice="Ask" Plus="2" Vol="" />
+    <hotkey Mod="0" Vkey="S" Dir="s" Ocp="o" BasePrice="Ask" Plus="-1" Vol="" />
+    </limit>
+    <condition>
+    </condition>
+<!----b=buy-s=sell--->
+</root>

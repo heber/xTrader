@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf8" ?>
+<root>
+	<broker BrokerID="10001" BrokerName="华鑫期货模拟">
+	<AuthCode>E9DCXR3F5UEF3VLC</AuthCode>
+		<FloatProfitAlgorithm>浮盈不计，浮亏计</FloatProfitAlgorithm>		
+		<!--
+			"浮盈浮亏都计算";
+			"浮盈不计，浮亏计";
+			"浮盈计，浮亏不计";
+			"浮盈浮亏都不计算";
+		-->
+		<MarginAlgorithm>按开仓价计算</MarginAlgorithm>
+		<!--
+			"按前结算计算";
+			"按最新价计算";
+			"盘中按最新价计算, 盘后按结算价计算";
+			"按最新均价计算";
+			"按开仓价计算";
+		-->
+        <IsOldRiskAlg>0</IsOldRiskAlg>
+　    　<!--
+　     　    是否使用老的风险度算法
+        -->			
+		<IsDiscountCZCE>1</IsDiscountCZCE>		
+		<!--
+			郑州组合是否优惠
+		-->		
+		<Servers>
+			<Server>
+				<Name>内部地址udp</Name>
+				<Trading>
+					<item>tcp://172.21.19.1:41205</item>
+				</Trading>
+				<MarketData>
+					<item>tcp://udp://172.21.19.1:18213</item>
+				</MarketData>
+			</Server>
+		</Servers>
+	</broker>
+</root>

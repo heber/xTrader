@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Fees InvRange="1" BkrID="1017" InvID="00000028">
+	<Fee PID="a" OpenByM="0" OpenByV="4" CloseByM="0" CloseByV="4" ClosetByM="0" ClosetByV="0" />
+	<Fee PID="al" OpenByM="0" OpenByV="4" CloseByM="0" CloseByV="4" ClosetByM="0" ClosetByV="0" />
+	<Fee PID="au" OpenByM="0" OpenByV="40" CloseByM="0" CloseByV="40" ClosetByM="0" ClosetByV="40" />
+	<Fee PID="b" OpenByM="0" OpenByV="4" CloseByM="0" CloseByV="4" ClosetByM="0" ClosetByV="4" />
+	<Fee PID="c" OpenByM="0" OpenByV="4" CloseByM="0" CloseByV="4" ClosetByM="0" ClosetByV="4" />
+	<Fee PID="CF" OpenByM="0" OpenByV="10" CloseByM="0" CloseByV="10" ClosetByM="0" ClosetByV="10" />
+	<Fee PID="cu" OpenByM="0.00016" OpenByV="0" CloseByM="0.00016" CloseByV="0" ClosetByM="0" ClosetByV="0.00016" />
+	<Fee PID="fu" OpenByM="7e-005" OpenByV="0" CloseByM="7e-005" CloseByV="0" ClosetByM="0" ClosetByV="7e-005" />
+	<Fee PID="IF" OpenByM="7e-005" OpenByV="0" CloseByM="7e-005" CloseByV="0" ClosetByM="3.5e-005" ClosetByV="0" />
+	<Fee PID="j" OpenByM="0.0002" OpenByV="0" CloseByM="0.0002" CloseByV="0" ClosetByM="0.0002" ClosetByV="0" />
+	<Fee PID="l" OpenByM="0" OpenByV="4" CloseByM="0" CloseByV="4" ClosetByM="0" ClosetByV="4" />
+	<Fee PID="m" OpenByM="0" OpenByV="4" CloseByM="0" CloseByV="4" ClosetByM="0" ClosetByV="4" />
+	<Fee PID="p" OpenByM="0" OpenByV="20" CloseByM="0" CloseByV="20" ClosetByM="0" ClosetByV="12" />
+	<Fee PID="PM" OpenByM="0" OpenByV="16" CloseByM="0" CloseByV="16" ClosetByM="0" ClosetByV="16" />
+	<Fee PID="rb" OpenByM="5e-005" OpenByV="0" CloseByM="5e-005" CloseByV="0" ClosetByM="0" ClosetByV="0" />
+	<Fee PID="ru" OpenByM="0.05" OpenByV="0" CloseByM="0.05" CloseByV="0" ClosetByM="0.05" ClosetByV="0" />
+	<Fee PID="SR" OpenByM="0" OpenByV="6.4" CloseByM="0" CloseByV="6.4" ClosetByM="0" ClosetByV="6.4" />
+	<Fee PID="TA" OpenByM="0" OpenByV="6.4" CloseByM="0" CloseByV="6.4" ClosetByM="0" ClosetByV="6.4" />
+	<Fee PID="v" OpenByM="0" OpenByV="6" CloseByM="0" CloseByV="6" ClosetByM="0" ClosetByV="0" />
+	<Fee PID="wr" OpenByM="5e-005" OpenByV="0" CloseByM="5e-005" CloseByV="0" ClosetByM="0" ClosetByV="0" />
+	<Fee PID="y" OpenByM="0" OpenByV="7" CloseByM="0" CloseByV="7" ClosetByM="0" ClosetByV="7" />
+	<Fee PID="zn" OpenByM="0" OpenByV="8" CloseByM="0" CloseByV="8" ClosetByM="0" ClosetByV="8" />
+</Fees>
