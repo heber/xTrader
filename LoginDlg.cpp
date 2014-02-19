@@ -22,11 +22,13 @@ LoginDlg::LoginDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(LoginDlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-	m_szUser = _T("888888");
-	m_szPass = _T("hua123456");
-	m_bSave = TRUE;
+	m_szUser = _T("00000028");
+	m_szPass = _T("123456");
+	m_bSavePwd = TRUE;
+	m_bSaveHis = TRUE;
 	m_pLogin = NULL;
-//	g_bOnce = TRUE;
+	m_iSelBkr = 183;
+	m_iSelSvr = 0;
 	m_szArTs.RemoveAll();
 	m_szArMd.RemoveAll();
 	m_szBrkName = _T("");
@@ -35,7 +37,7 @@ LoginDlg::LoginDlg(CWnd* pParent /*=NULL*/)
 
 LoginDlg::~LoginDlg()
 {
-	//SaveConfig();
+	ClearVector(m_pInfVec);
 }
 
 void LoginDlg::LoadConfig()
@@ -44,33 +46,54 @@ void LoginDlg::LoadConfig()
 
 	xml_document doc;
 	xml_node proot;
-	//char szBrkNm[32];
 	xml_parse_result result = doc.load_file(CFG_FILE);
 	if (result.status == status_ok)
 	{
 		proot = doc.child(ROOT);
 		if (!proot) return;
 		
-		m_iSel1 = atoi(proot.child_value(BKR_GRP));
-		m_iSel2 = atoi(proot.child_value(SV_GRP));
-		m_bSave = atoi(proot.child_value(SV_INF));
+		m_bSavePwd = atoi(proot.child_value(SV_PWD));
 		
-		char szEncPass[60];
-		strcpy(xTApp->m_sINVESTOR_ID, proot.child_value(USER_ID));
-		strcpy(szEncPass,proot.child_value(USER_PW));
-		strcpy(xTApp->m_szInst ,proot.child_value(INS_LST));
-		
-		Base64Decode(xTApp->m_sPASSWORD, (const char*)szEncPass, 0);
-		ansi2uni(CP_UTF8,xTApp->m_sINVESTOR_ID,m_szUser.GetBuffer(MAX_PATH));
-		m_szUser.ReleaseBuffer();
-		ansi2uni(CP_UTF8,xTApp->m_sPASSWORD,m_szPass.GetBuffer(MAX_PATH));
-		m_szPass.ReleaseBuffer();
-
+		strcpy(xTApp->m_szInst, proot.child_value(INS_LST));
 		xml_node nodeWInf = proot.child(WND_INF);
 		xTApp->m_ixPos = nodeWInf.attribute("xPos").as_int();
 		xTApp->m_iyPos = nodeWInf.attribute("yPos").as_int();
 		xTApp->m_iWidth = nodeWInf.attribute("width").as_int();
 		xTApp->m_iHeight = nodeWInf.attribute("height").as_int();
+
+		xml_node nodeRecent = proot.child(RECNT);
+		m_bSaveHis = nodeRecent.attribute("bSave").as_bool();
+
+		if (m_bSaveHis)
+		{	//都是英文字符所以ansi和utf8编码一样，否则需要转码
+			for (xml_node nodeHis = nodeRecent.first_child(); nodeHis; nodeHis = nodeHis.next_sibling())
+			{
+				PLOGINPARA pInf = new LOGINPARA;
+				strcpy(pInf->szUid, nodeHis.attribute(USER_ID).value());
+				strcpy(pInf->szPass, nodeHis.attribute(USER_PW).value());
+				pInf->iBkrGroup = nodeHis.attribute(BKR_GRP).as_int();
+				pInf->iSvrGroup = nodeHis.attribute(SV_GRP).as_int();
+
+				m_pInfVec.push_back(pInf);
+			}
+
+			UINT iSize = m_pInfVec.size();
+			if (iSize >= 1)
+			{
+				strcpy(xTApp->m_sINVESTOR_ID, m_pInfVec[iSize-1]->szUid);
+				ansi2uni(CP_UTF8, xTApp->m_sINVESTOR_ID, m_szUser.GetBuffer(MAX_PATH));
+				m_szUser.ReleaseBuffer();
+
+				//char szEncPass[64];
+				//strcpy(szEncPass, m_pInfVec[iSize-1]->szPass);
+				Base64Decode(xTApp->m_sPASSWORD, (const char*)m_pInfVec[iSize-1]->szPass, 0);
+				ansi2uni(CP_UTF8, xTApp->m_sPASSWORD, m_szPass.GetBuffer(MAX_PATH));
+				m_szPass.ReleaseBuffer();
+
+				m_iSelBkr = m_pInfVec[iSize-1]->iBkrGroup;
+				m_iSelSvr = m_pInfVec[iSize-1]->iSvrGroup;
+			}
+		}
 		
 	}
 	else
@@ -89,16 +112,16 @@ void LoginDlg::LoadConfig()
 			m_ComboBkr.SetItemData(nIndex,i);
 		}
 		
-		m_ComboBkr.SetCurSel(m_iSel1);
+		m_ComboBkr.SetCurSel(m_iSelBkr);
 		/////////////////////////////////////////////////////////////	
-		result = doc.load_file(xTApp->m_BkrParaVec[m_iSel1]->XmlPath);
+		result = doc.load_file(xTApp->m_BkrParaVec[m_iSelBkr]->XmlPath);
 		if (result.status == status_ok) 
 		{
 			proot = doc.child(ROOT).child("broker");
 			if (!proot) return;
 			
 			strcpy(xTApp->m_sBROKER_ID,proot.attribute("BrokerID").value());
-			m_szBrkName = xTApp->m_BkrParaVec[m_iSel1]->BkrName;
+			m_szBrkName = xTApp->m_BkrParaVec[m_iSelBkr]->BkrName;
 			
 			///////////读出服务器//////////////////
 			LPCSTR szSvrRt="//broker/Servers/Server",sNmae="Name",sTrading="Trading",sMData="MarketData";
@@ -117,7 +140,7 @@ void LoginDlg::LoadConfig()
 				tName.ReleaseBuffer();
 				szAr.Add(tName);
 				//如果循环到指定组,读出信息,遍历服务器组名称
-				if (szAr.GetSize()==(m_iSel2+1))
+				if (szAr.GetSize()==(m_iSelSvr+1))
 				{
 					xml_node tool;
 					
@@ -147,10 +170,10 @@ void LoginDlg::LoadConfig()
 				m_ComboIsp.SetItemData(nIndex,i);
 			}
 			
-			m_ComboIsp.SetCurSel(m_iSel2);
+			m_ComboIsp.SetCurSel(m_iSelSvr);
 			::SendMessage(m_hWnd, WM_COMMAND,MAKEWPARAM(IDC_ISPLIST,CBN_SELCHANGE),(LPARAM)m_ComboIsp.GetSafeHwnd());
 		}
-
+		
 	}
 	else
 	{
@@ -165,7 +188,7 @@ void LoginDlg::SaveConfig()
 {
 	CXTraderApp* pApp = (CXTraderApp*)AfxGetApp();
 
-	if (m_bSave)
+	//if (m_bSavePwd)
 	{
 		UpdateData();
 		
@@ -177,35 +200,95 @@ void LoginDlg::SaveConfig()
 		{
 			proot = doc.child(ROOT);
 			
-			proot.remove_child(SV_INF);
-			proot.remove_child(SV_GRP);
-			proot.remove_child(BKR_GRP);
-			proot.remove_child(USER_ID);
-			proot.remove_child(USER_PW);
+			proot.remove_child(SV_PWD);
 			
-			char szUid[2*MAX_PATH],szPass[2*MAX_PATH],szSave[4],szGrp1[4],szGrp2[4];
-			sprintf(szSave,"%d",m_bSave);
-			sprintf(szGrp1,"%d",m_iSel1);
-			sprintf(szGrp2,"%d",m_iSel2);
+			TThostFtdcInvestorIDType szUid;
+			TThostFtdcPasswordType szPass;
+			
+			char szSave[4],szGrp1[4],szGrp2[4];
+			sprintf(szSave,"%d",m_bSavePwd);
+			sprintf(szGrp1,"%d",m_iSelBkr);
+			sprintf(szGrp2,"%d",m_iSelSvr);
 			uni2ansi(CP_ACP,(LPTSTR)(LPCTSTR)m_szUser,szUid);
-			uni2ansi(CP_ACP,(LPTSTR)(LPCTSTR)m_szPass,szPass);
-			
-			char szEncPass[60];
-			Base64Encode(szEncPass, (const char*)szPass, 0); 
-			xml_node nodeSi = proot.append_child(SV_INF);
+			char szEncPass[64];
+			//如果保存密码都要简单加密
+			if (m_bSavePwd)
+			{
+				uni2ansi(CP_ACP, (LPTSTR)(LPCTSTR)m_szPass, szPass);
+				Base64Encode(szEncPass, (const char*)szPass, 0);
+			}
+			else
+			{
+				ZeroMemory(szPass, sizeof(szPass));
+			}
+		
+			//把登录参数记录成结构保存
+			PLOGINPARA pInf = new LOGINPARA;
+			strcpy(pInf->szUid, szUid);
+			strcpy(pInf->szPass, szEncPass);
+			pInf->iBkrGroup = m_iSelBkr;
+			pInf->iSvrGroup = m_iSelSvr;
+
+			xml_node nodeSi = proot.append_child(SV_PWD);
 			nodeSi.append_child(node_pcdata).set_value(szSave);
 			
-			xml_node nodeGrp1 = proot.append_child(BKR_GRP);
-			nodeGrp1.append_child(node_pcdata).set_value(szGrp1);
-			
-			xml_node nodeGrp2 = proot.append_child(SV_GRP);
-			nodeGrp2.append_child(node_pcdata).set_value(szGrp2);
-			
-			xml_node nodeUid = proot.append_child(USER_ID);
-			nodeUid.append_child(node_pcdata).set_value(szUid);
-			
-			xml_node nodeUpw = proot.append_child(USER_PW);
-			nodeUpw.append_child(node_pcdata).set_value(szEncPass);
+			UINT i = 0;
+			xml_node nodeRecent = proot.child(RECNT);
+			if (nodeRecent)
+			{
+				nodeRecent.remove_attribute("bSave");
+				if (m_bSaveHis)
+				{
+					UINT iSize = m_pInfVec.size();
+					if (iSize>=1)
+					{
+						///////清除重复登陆的用户存档
+						for (VIT_lp vlp = m_pInfVec.begin(); vlp != m_pInfVec.end();)
+						{
+							if ((!strcmp((*vlp)->szUid, szUid)) && ((*vlp)->iBkrGroup == m_iSelBkr))
+							{
+								vlp = m_pInfVec.erase(vlp);
+							}
+							else
+								++vlp;
+						}
+					}
+					m_pInfVec.push_back(pInf);
+					///删掉超过MAX_HIS条记录的前几条
+					iSize = m_pInfVec.size();
+					if (iSize > MAX_HIS)
+					{
+						for (i = 0; i < (iSize - MAX_HIS); i++)
+						{
+							m_pInfVec.erase(m_pInfVec.begin());
+						}
+					}
+					//////////新纪录保存
+					proot.remove_child(RECNT);
+					nodeRecent = proot.append_child(RECNT);
+					nodeRecent.append_attribute("bSave") = "true";
+					xml_node nodeHis;
+					iSize = m_pInfVec.size();
+					//char szEncPwd[64];
+					for (i = 0; i < iSize; i++)
+					{
+						nodeHis = nodeRecent.append_child(ACINF);
+						nodeHis.append_attribute(USER_ID) = m_pInfVec[i]->szUid;
+						nodeHis.append_attribute(USER_PW) = m_pInfVec[i]->szPass;
+						nodeHis.append_attribute(BKR_GRP) = m_pInfVec[i]->iBkrGroup;
+						nodeHis.append_attribute(SV_GRP) = m_pInfVec[i]->iSvrGroup;
+						doc.save_file(CFG_FILE, PUGIXML_TEXT("\t"), format_default, encoding_utf8);
+					}
+				}
+				else
+				{
+					proot.remove_child(RECNT);
+					nodeRecent = proot.append_child(RECNT);
+					nodeRecent.append_attribute("bSave") = "false";
+				}
+
+
+			}
 			
 			doc.save_file(CFG_FILE,PUGIXML_TEXT("\t"),format_default,encoding_utf8);
 		}
@@ -222,7 +305,7 @@ void LoginDlg::DoDataExchange(CDataExchange* pDX)
 	DDV_MaxChars(pDX, m_szUser, 13);
 	DDX_Text(pDX, IDC_PASSWORD, m_szPass);
 	DDV_MaxChars(pDX, m_szPass, 41);
-	DDX_Check(pDX, IDC_SAVE, m_bSave);
+	DDX_Check(pDX, IDC_SAVE, m_bSavePwd);
 	DDX_Control(pDX, IDC_PROGRESS, m_prgs);
 	DDX_Control(pDX, IDC_LOGINFO, m_staInfo);
 	//}}AFX_DATA_MAP
@@ -303,7 +386,7 @@ void LoginDlg::OnNetset()
 	DlgNetSel* tdlg = new DlgNetSel;
 	
 	tdlg->m_szGrpName = str;
-	tdlg->m_iIdx = m_iSel1;
+	tdlg->m_iIdx = m_iSelBkr;
 
 	BOOL res=tdlg->Create(IDD_DLG_NETSET,NULL);
 	VERIFY( res==TRUE );
@@ -316,7 +399,7 @@ void LoginDlg::OnNetset()
 
 void LoginDlg::OnSave() 
 {
-	m_bSave = !m_bSave;	
+	m_bSavePwd = !m_bSavePwd;	
 }
 
 ////////选定一组服务器响应事件///////
@@ -325,13 +408,13 @@ void LoginDlg::OnSelISP()
 	CXTraderApp* pApp = (CXTraderApp*)AfxGetApp();
 	if(m_ComboIsp.GetCurSel() >= 0)
 	{
-		m_iSel2 = m_ComboIsp.GetCurSel();
+		m_iSelSvr = m_ComboIsp.GetCurSel();
 
 		CString str;
 		m_ComboIsp.GetWindowText(str);
 
 		//把指定组的服务器信息读取填充
-		pApp->AddSvr2Ar(m_szArTs,m_szArMd,str,m_iSel1);
+		pApp->AddSvr2Ar(m_szArTs,m_szArMd,str,m_iSelBkr);
 	}
 }
 
@@ -341,19 +424,19 @@ void LoginDlg::OnSelBkr()
 	CXTraderApp* pApp = (CXTraderApp*)AfxGetApp();
 	if(m_ComboBkr.GetCurSel() >= 0)
 	{
-		m_iSel1 = m_ComboBkr.GetCurSel();
+		m_iSelBkr = m_ComboBkr.GetCurSel();
 		
 		xml_document doc;
 		xml_node proot;
 		//CString szBrkID;
-		xml_parse_result result = doc.load_file(pApp->m_BkrParaVec[m_iSel1]->XmlPath);
+		xml_parse_result result = doc.load_file(pApp->m_BkrParaVec[m_iSelBkr]->XmlPath);
 		if (result.status == status_ok) 
 		{
 			proot = doc.child(ROOT).child("broker");
 			if (!proot) return;
 			
 			strcpy(pApp->m_sBROKER_ID,proot.attribute("BrokerID").value());
-			m_szBrkName = pApp->m_BkrParaVec[m_iSel1]->BkrName;
+			m_szBrkName = pApp->m_BkrParaVec[m_iSelBkr]->BkrName;
 			
 			///////////读出服务器分组列表//////////////////
 			LPCSTR szSvrRt="//broker/Servers/Server",sNmae="Name",sTrading="Trading",sMData="MarketData";

@@ -232,6 +232,10 @@ SOURCE=.\DlgQryHiSet.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\DlgRecent.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\GenMfDlg.h
 # End Source File
 # Begin Source File

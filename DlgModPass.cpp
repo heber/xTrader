@@ -136,6 +136,37 @@ UINT DlgModPass::ModPwdThread(LPVOID pParam)
 		{
 			strcpy(pApp->m_sPASSWORD,szNewPass);
 			ResetEvent(g_hEvent);
+			///////保存修改的密码////////
+			xml_document doc;
+			xml_node proot;
+			xml_parse_result result;
+
+			result = doc.load_file(CFG_FILE, parse_full);
+			if (result.status == status_ok)
+			{
+				proot = doc.child(ROOT);
+
+				//保存修改过的交易密码
+				xml_node nodeRecent = proot.child(RECNT);
+				xml_node nodeLast = nodeRecent.last_child();
+
+				//备份一下
+				int iBkrGroup = nodeLast.attribute(BKR_GRP).as_int();
+				int iSvrGroup = nodeLast.attribute(SV_GRP).as_int();
+
+				nodeRecent.remove_child(nodeLast);
+				char szEncPass[64];
+				Base64Encode(szEncPass, pApp->m_sPASSWORD, 0);
+
+				nodeLast = nodeRecent.append_child(ACINF);
+				nodeLast.append_attribute(USER_ID) = pApp->m_sINVESTOR_ID;
+				nodeLast.append_attribute(USER_PW) = szEncPass;
+				nodeLast.append_attribute(BKR_GRP) = iBkrGroup;
+				nodeLast.append_attribute(SV_GRP) = iSvrGroup;
+
+				//////////////////////////////////	
+				doc.save_file(CFG_FILE, PUGIXML_TEXT("\t"), format_default, encoding_utf8);
+			}
 		}
 		
 	}

@@ -81,10 +81,11 @@ typedef struct ClientInf
 	TCHAR ProdInf[11];
 }CLINFO,*PCLINFO;
 
+typedef char TThostFtdcEncPasswordType[64];
 typedef struct LoginPara
 {
 	TThostFtdcInvestorIDType szUid;
-	TThostFtdcPasswordType szPass;
+	TThostFtdcEncPasswordType szPass;
 	int iBkrGroup;
 	int iSvrGroup;
 }LOGINPARA,*PLOGINPARA;
@@ -94,6 +95,7 @@ typedef vector<CThostFtdcInvestorPositionField*> ::iterator VInvP;
 typedef vector<CThostFtdcInstrumentFieldEx*>::iterator VIT_if;
 typedef vector<CThostFtdcInstrumentMarginRateField*>::iterator VIT_mr;
 typedef vector<CThostFtdcInstrumentCommissionRateField*>::iterator VIT_cf;
+typedef vector<LOGINPARA*>::iterator VIT_lp;
 
 #define _REAL_CTP_
 
@@ -114,15 +116,17 @@ typedef vector<CThostFtdcInstrumentCommissionRateField*>::iterator VIT_cf;
 #define BFTRANS_TITLE _T("银期转账@%s")
 #define CONN_ERR _T("连接失败")
 #define  ACC_FBINFO _T("开户信息")
-#define USER_ID "LoginUserID"
-#define BKR_GRP "BrokerGroup"
-#define SV_GRP "ServerGroup"
-#define SV_INF "SaveInfo"
-#define USER_PW "UserPassword"
+#define USER_ID "Uid"
+#define BKR_GRP "BkrGroup"
+#define SV_GRP "SvrGroup"
+#define SV_PWD "SavePass"
+#define USER_PW "Pass"
 #define NTP_SVR "NtpServer"
 #define WND_INF "WndInfo"
 #define INS_LST "InstList"
 #define ROOT "root"
+#define RECNT "Recent"
+#define ACINF "AccInf"
 //#define SESRT "sessions"
 //#define SESITEM "session"
 #define WAIT_MS	10000
@@ -149,6 +153,7 @@ typedef vector<CThostFtdcInstrumentCommissionRateField*>::iterator VIT_cf;
 #define TRADE_ITMES 12
 #define ORDER_ITMES 14
 #define ALLINST_ITMES 10
+#define MAX_HIS 20
 
 #define UNCOMP _T("待完成")
 

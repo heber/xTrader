@@ -5,7 +5,6 @@
 #include "xTrader.h"
 #include "DlgQryHiSet.h"
 
-//extern vector<CThostFtdcSettlementInfoField*> StmiVec;
 extern HANDLE g_hEvent;
 
 IMPLEMENT_DYNAMIC(DlgQryHiSet, CDialog)

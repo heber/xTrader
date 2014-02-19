@@ -27,12 +27,13 @@ public:
 	CString	m_szPass;
 	//CString m_szDefTds,m_szDefMds;
 	//int		m_iPort;
-	BOOL	m_bSave;
-	int		m_iSel1,m_iSel2;
+	BOOL	m_bSavePwd,m_bSaveHis;
+	int		m_iSelBkr,m_iSelSvr;
 	CProgressCtrl	m_prgs;
 	CStatic	m_staInfo;
 	CString m_szBrkName;
 	CStringArray m_szArTs,m_szArMd;
+	vector<LOGINPARA*> m_pInfVec;
 	//}}AFX_DATA
 
 public:

@@ -13,6 +13,9 @@ public:
 
 // 对话框数据
 	enum { IDD = IDD_DLG_RECENT };
+	void InitLBox();
+	void GetSvrGNByIdx(CString &szOut, int iBkrG, int iSvrG);
+	void SetHScroll();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持

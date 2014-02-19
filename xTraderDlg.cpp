@@ -147,7 +147,6 @@ void CXTraderDlg::InitAllVecs()
 	//////////////////////////
 	m_orderVec = pApp->m_cT->m_orderVec;
 	m_tradeVec = pApp->m_cT->m_tradeVec;
-	//m_StmiVec = pApp->m_cT->m_StmiVec;
 	m_AccRegVec = pApp->m_cT->m_AccRegVec;
 	m_TdCodeVec = pApp->m_cT->m_TdCodeVec;
 	m_InvPosVec = pApp->m_cT->m_InvPosVec;
@@ -229,7 +228,7 @@ void CXTraderDlg::OnDestroy()
 
 	//防止退出崩溃 用暴力手段!
 	TerminateProcess(GetCurrentProcess(),0);
-	////////////////////////////////////////////////////
+	//////////////////////////////////////////
 	CDialog::OnDestroy();
 }
 
@@ -249,15 +248,8 @@ void CXTraderDlg::SaveConfig()
 		proot = doc.child(ROOT);
 		
 		//保存修改过的交易密码
-		proot.remove_child(USER_PW);
 		proot.remove_child(INS_LST);
 		proot.remove_child(WND_INF);
-		
-		char szEncPass[60];
-		Base64Encode(szEncPass, pApp->m_sPASSWORD, 0); 
-		
-		xml_node nodeUpw = proot.append_child(USER_PW);
-		nodeUpw.append_child(node_pcdata).set_value(szEncPass);
 		
 		xml_node nodeInst = proot.append_child(INS_LST);
 		nodeInst.append_child(node_pcdata).set_value(pApp->m_szInst);
@@ -589,8 +581,8 @@ void CXTraderDlg::InitData()
 	m_CombOC.SetCurSel(0);
 
 /////////////////////////////////////////////////////////////////////////////
-	
-	if (!m_pSubMd && IsValidInst(m_szInst))
+	BOOL bRes = IsValidInst(m_szInst);
+	if (!m_pSubMd && bRes)
 	{
 		m_pSubMd = AfxBeginThread((AFX_THREADPROC)SubscribeMD, this);
 		//Sleep(100);
@@ -608,7 +600,7 @@ void CXTraderDlg::InitData()
 	int iMaxVol=1000000;
 	double dPriceTick=1;
 	int iDig = 1;
-	//if (IsValidInst(m_szInst))
+	if (bRes)
 	{
 		dPriceTick = m_InstInf->PriceTick;
 		iMaxVol = m_InstInf->MaxLimitOrderVolume;
@@ -1226,9 +1218,6 @@ void CXTraderDlg::InitLstOnRoad()
 		InsertLstOnRoad(m_onRoadVec[nItem],INSERT_OP);
 
 	}
-	
-	//m_LstOnRoad.UnlockWindowUpdate();
-	//m_LstOnRoad.LoadColumns(_T("XListCtrl"), _T("Columns"));
 	g_bInitNtOnce = TRUE;
 
 }
@@ -1236,22 +1225,18 @@ void CXTraderDlg::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 {
 	
 	ASSERT(pPopupMenu != NULL);
-	// Check the enabled state of various menu items.
-	
+
 	CCmdUI state;
 	state.m_pMenu = pPopupMenu;
 	ASSERT(state.m_pOther == NULL);
 	ASSERT(state.m_pParentMenu == NULL);
-	
-	// Determine if menu is popup in top-level menu and set m_pOther to
-	// it if so (m_pParentMenu == NULL indicates that it is secondary popup).
 	HMENU hParentMenu;
 	if (AfxGetThreadState()->m_hTrackingMenu == pPopupMenu->m_hMenu)
 		state.m_pParentMenu = pPopupMenu; // Parent == child for tracking popup.
 	else if ((hParentMenu = ::GetMenu(m_hWnd)) != NULL)
 	{
 		CWnd* pParent = this;
-		// Child windows don't have menus--need to go to the top!
+	
 		if (pParent != NULL &&
 			(hParentMenu = ::GetMenu(pParent->m_hWnd)) != NULL)
 		{
@@ -1260,7 +1245,6 @@ void CXTraderDlg::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			{
 				if (::GetSubMenu(hParentMenu, nIndex) == pPopupMenu->m_hMenu)
 				{
-					// When popup is found, m_pParentMenu is containing menu.
 					state.m_pParentMenu = CMenu::FromHandle(hParentMenu);
 					break;
 				}
@@ -1292,14 +1276,10 @@ void CXTraderDlg::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		}
 		else
 		{
-			// Normal menu item.
-			// Auto enable/disable if frame window has m_bAutoMenuEnable
-			// set and command is _not_ a system command.
 			state.m_pSubMenu = NULL;
 			state.DoUpdate(this, FALSE);
 		}
 		
-		// Adjust for menu deletions and additions.
 		UINT nCount = pPopupMenu->GetMenuItemCount();
 		if (nCount < state.m_nIndexMax)
 		{
@@ -1387,8 +1367,6 @@ void CXTraderDlg::OnMinimize()
 {
 	ShowWindow(SW_MINIMIZE);
 	ShowWindow(SW_HIDE);
-	
-	//ShowNotifyIcon(this,WM_COMMAND,_T(""),_T(""),2,NIM_ADD);
 }
 
 void CXTraderDlg::OnTimer(UINT nIDEvent) 
@@ -1486,8 +1464,6 @@ void CXTraderDlg::OnPaint()
 	}
 }
 
-// The system calls this to obtain the cursor to display while the user drags
-//  the minimized window.
 HCURSOR CXTraderDlg::OnQueryDragIcon()
 {
 	return (HCURSOR) m_hIcon;
@@ -1822,11 +1798,6 @@ void CXTraderDlg::OnClick(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// OnDblClick
-//
-// This method shows how to handle NM_DBLCLK messages from XListCtrl
-//
 void CXTraderDlg::OnDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMITEMACTIVATE pNMIA = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
@@ -1844,11 +1815,6 @@ void CXTraderDlg::OnDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// OnColumnClick
-//
-// This method shows how to handle LVN_COLUMNCLICK messages from XListCtrl
-//
 void CXTraderDlg::OnColumnClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
@@ -1867,11 +1833,6 @@ void CXTraderDlg::OnColumnClick(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// OnItemChanged
-//
-// This method shows how to handle LVN_ITEMCHANGED messages from XListCtrl
-//
 void CXTraderDlg::OnItemChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
@@ -1893,102 +1854,6 @@ void CXTraderDlg::OnItemChanged(NMHDR* pNMHDR, LRESULT* pResult)
 
 	*pResult = 0;
 }
-
-///////////////////////////////////////////////////////////////////////////////
-/*
-LRESULT CXTraderDlg::OnEditEnd(WPARAM wParam, LPARAM lParam)
-{
-	int nItem    = (int) wParam;
-	int nSubItem = (int) LOWORD(lParam);
-	UINT nID     = HIWORD(lParam);
-
-	TRACE(_T("nID=%d\n"), nID);
-	VERIFY(nID == IDC_LST_ONROAD);
-
-	if (nItem >= 0 && nSubItem >= 0)
-	{
-		CString strText = m_LstOnRoad.GetItemText(nItem, nSubItem);
-		//Log(_T("OnEditEnd at (%d,%d):  '%s'"), nItem, nSubItem, strText);
-
-		COLORREF crText, crBackground;
-		m_LstOnRoad.GetItemColors(nItem, nSubItem, crText, crBackground);
-		if (m_LstOnRoad.GetModified(nItem, nSubItem))
-		{
-			// subitem was modified - color it red
-			m_LstOnRoad.SetItemText(nItem, nSubItem, strText, 
-				RGB(255,0,0), crBackground);
-	
-		}
-		else
-		{
-			// subitem not modified - color it black -
-			// note that once modified, a subitem will remain
-			// marked as modified
-			m_LstOnRoad.SetItemText(nItem, nSubItem, strText, 
-				RGB(0,0,0), crBackground);
-		}
-	}
-
-	return 0;
-}
-
-
-void CXTraderDlg::OnBeginlabeledit(NMHDR* pNMHDR, LRESULT* pResult) 
-{
-	TRACE(_T("in CXListCtrlTestDlg::OnBeginlabeledit\n"));
-	
-	NMLVDISPINFO* pDispInfo = (NMLVDISPINFO*)pNMHDR;
-	
-	ASSERT(pDispInfo);
-	
-	if (pDispInfo)
-	{
-		//Log(_T("LVN_BEGINLABELEDIT for (%d,%d)"), pDispInfo->item.iItem, pDispInfo->item.iSubItem);
-	}
-	
-	// get handle to edit control
-	HWND hWnd = (HWND) m_LstOnRoad.SendMessage(LVM_GETEDITCONTROL);
-	//Log(_T("LVM_GETEDITCONTROL returned 0x%X"), hWnd);
-	
-	if (hWnd && ::IsWindow(hWnd))
-	{
-		// force input to upper case
-		CWnd * pEdit = FromHandle(hWnd);
-		pEdit->ModifyStyle(0, ES_UPPERCASE);
-		//Log(_T("Setting input to upper case"));
-	}
-	
-	if (pDispInfo->item.iItem == 0 && pDispInfo->item.iSubItem == 4)
-		SetTimer(5, 2000, NULL);	// set timer to send LVM_CANCELEDITLABEL
-	
-	*pResult = 0;		// return 0 to allow editing, 1 to disallow
-}
-
-
-void CXTraderDlg::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult) 
-{
-	TRACE(_T("in CXListCtrlTestDlg::OnEndlabeledit\n"));
-	
-	NMLVDISPINFO* pDispInfo = (NMLVDISPINFO*)pNMHDR;
-	
-	ASSERT(pDispInfo);
-	
-	if (pDispInfo)
-	{
-		BOOL bNull = FALSE;
-		if (pDispInfo->item.pszText == NULL)
-			bNull = TRUE;
-		
-		//CString str = pDispInfo->item.pszText;		// NOTE:  pszText might be NULL
-		
-		//Log(_T("LVN_ENDLABELEDIT for (%d,%d):  '%s' - pszText is %s"), 
-		//	pDispInfo->item.iItem, pDispInfo->item.iSubItem, str,
-		//	bNull ? _T("NULL") : _T("not NULL"));
-	}
-	
-	*pResult = 1;		// return 1 to accept new text, 0 to reject
-}
-*/
 
 void CXTraderDlg::InitTabs()
 {
@@ -2620,7 +2485,7 @@ void CXTraderDlg::OnCancelAll()
 
 void CXTraderDlg::OnModDsj()
 {
-	CXTraderApp* pApp = (CXTraderApp*)AfxGetApp();
+	//CXTraderApp* pApp = (CXTraderApp*)AfxGetApp();
 
 }
 
@@ -2752,9 +2617,9 @@ void CXTraderDlg::PopupPrivInf()
 		for (UINT i=0;i<m_TdCodeVec.size();i++)
 		{
 			ansi2uni(CP_ACP,m_TdCodeVec[i]->ClientID,szTemp);
-			if (!strcmp(m_TdCodeVec[i]->ExchangeID,"CFFEX"))
+			if (!strcmp(m_TdCodeVec[i]->ExchangeID, "DCE"))
 			{
-				szLine += FormatLine(_T(" 中金所交易编码:"),szTemp,_T(" "),44);
+				szLine += FormatLine(_T(" 大商所交易编码:"), szTemp, _T(" "), 44);
 			}
 			else if (!strcmp(m_TdCodeVec[i]->ExchangeID,"SHFE"))
 			{
@@ -2764,9 +2629,9 @@ void CXTraderDlg::PopupPrivInf()
 			{		
 				szLine += FormatLine(_T(" 郑商所交易编码:"),szTemp,_T(" "),44);
 			}
-			else if (!strcmp(m_TdCodeVec[i]->ExchangeID,"DCE"))
+			else if(!strcmp(m_TdCodeVec[i]->ExchangeID, "CFFEX"))
 			{
-				szLine += FormatLine(_T(" 大商所交易编码:"),szTemp,_T(" "),44);
+				szLine += FormatLine(_T(" 中金所交易编码:"), szTemp, _T(" "), 44);
 			}
 			else
 			{

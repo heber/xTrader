@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
 	<NtpServer>cn.pool.ntp.org</NtpServer>
-	<SaveInfo>1</SaveInfo>
-	<BrokerGroup>183</BrokerGroup>
-	<ServerGroup>0</ServerGroup>
-	<LoginUserID>00000028</LoginUserID>
-	<UserPassword>zs3My8rJ</UserPassword>
-	<InstList>IF1402</InstList>
-	<WndInfo xPos="408" yPos="282" width="695" height="359" />
+	<SavePass>1</SavePass>
+	<Recent bSave="true">
+		<AccInf Uid="400000" Pass="x8zPy83N" BkrGroup="1" SvrGroup="0" />
+		<AccInf Uid="00000028" Pass="zs3My8rJ" BkrGroup="183" SvrGroup="0" />
+		<AccInf Uid="00000018" Pass="zs3My8rJ" BkrGroup="183" SvrGroup="0" />
+		<AccInf Uid="00000008" Pass="zs3My8rJ" BkrGroup="183" SvrGroup="0" />
+		<AccInf Uid="00000068" Pass="zs3My8rJ" BkrGroup="183" SvrGroup="0" />
+		<AccInf Uid="00000038" Pass="zs3My8rJ" BkrGroup="183" SvrGroup="0" />
+	</Recent>
+	<InstList>ag1406</InstList>
+	<WndInfo xPos="289" yPos="142" width="695" height="359" />
 </root>
